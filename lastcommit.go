@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 )
 
 func getDirectory() string {
@@ -21,8 +22,17 @@ func getLastCommitMessage() string {
 	return string(out[:])
 }
 
-func getCommitMessagePrefix(msg string) string {
-	return msg
+// GetCommitMessagePrefix retuns the issue prefix from a commit message
+func GetCommitMessagePrefix(msg string) string {
+	// ^.{7,} (.+):
+	re := regexp.MustCompile("^.{7,} (.+):")
+	matches := re.FindStringSubmatch(msg)
+
+	if len(matches) > 0 {
+		return matches[1]
+	}
+
+	return ""
 }
 
 func main() {
@@ -31,8 +41,8 @@ func main() {
 
 	// find the last commit
 	lastCommitMsg := getLastCommitMessage()
-	prefix := getCommitMessagePrefix(lastCommitMsg)
-	fmt.Printf("The last commit's prefix was: %s\n", prefix)
+	prefix := GetCommitMessagePrefix(lastCommitMsg)
+	fmt.Printf("last commit's prefix: %s\n", prefix)
 
 	// read its prefix
 
